@@ -237,7 +237,12 @@ export const AGENCIA: BrandProfile = {
       },
     ],
 
-    registroDetalle: `Español rioplatense, VOSEO consistente. "tenés, podés, querés, sabés"; imperativos "mirá, fijate, probá, escribinos". Es una marca argentina hablándole a un mercado argentino: sonar neutro-corporativo es perder la diferencia. Lo que NO se hace es mezclar: nunca voseo y tuteo en la misma pieza.`,
+    registroDetalle: `Español rioplatense, VOSEO consistente. Es una marca argentina hablándole a un mercado argentino: sonar neutro-corporativo es perder la diferencia. Lo que NO se hace es mezclar voseo y tuteo en la misma pieza.
+
+El modo de falla es el inverso al de una marca neutra: el modelo tiende a caer en la forma "tú" por defecto. Revisá TODO verbo en segunda persona del singular, en dos lugares:
+- IMPERATIVOS, donde más se nota: "mira" → "mirá"; "fíjate" → "fijate"; "prueba" → "probá"; "revisa" → "revisá"; "escríbenos" → "escribinos"; "descarga" → "descargá"; "verifica" → "verificá".
+- PRESENTE INDICATIVO, donde pasa desapercibido: "tienes" → "tenés"; "puedes" → "podés"; "quieres" → "querés"; "sabes" → "sabés"; "necesitas" → "necesitás"; "pierdes" → "perdés"; "mides" → "medís"; "cuentas" → "contás".
+- Pronombres: "a ti" → "a vos"; "contigo" → "con vos".`,
 
     correcciones: [
       { re: /\bpauta\s+paga\b/gi, to: "publicidad" },
@@ -248,6 +253,10 @@ export const AGENCIA: BrandProfile = {
       { re: /\brankea\b/gi, to: "posiciona" },
       { re: /\branking\b/gi, to: "posicionamiento" },
       { re: /\bparsear\b/gi, to: "procesar" },
+      // Verbos anglosajones con equivalente natural y directo en castellano.
+      { re: /\btrackear\b/gi, to: "medir" },
+      { re: /\btargetear\b/gi, to: "segmentar" },
+      { re: /\bperformear\b/gi, to: "rendir" },
     ],
 
     prohibiciones: [
@@ -283,6 +292,26 @@ export const AGENCIA: BrandProfile = {
         re: /\b(últimos? (lugares|cupos)|no te lo pierdas|oferta por tiempo limitado|solo por hoy|antes de que sea tarde)\b/gi,
         motivo:
           "Urgencia fabricada. Con un comprador que ya viene escéptico, la presión confirma su sospecha de que le están vendiendo.",
+      },
+      // Jerga importada que suena a consultora. OJO: los términos técnicos ya
+      // instalados del rubro NO entran acá y no se traducen — ROAS, CPA, CTR,
+      // CPM, paid media, remarketing, retargeting, lookalike, landing.
+      {
+        re: /\b(pain\s?point|quick\s?win|low\s?hanging\s?fruit|deep\s?dive|insight accionable|must[- ]have|top of mind|customer journey|nice to have)\b/gi,
+        motivo:
+          "Anglicismo de jerga con equivalente natural en castellano. Decilo concreto y directo.",
+      },
+      {
+        re: /\b(el growth|de growth|awareness|el engagement|de engagement)\b/gi,
+        motivo:
+          "Anglicismo usado como sustantivo suelto. Nombrá la cosa concreta: recordación, interacción, crecimiento de la venta.",
+      },
+      // Las metáforas son de los delatores de IA más fuertes, y las abstractas
+      // además tapan el mecanismo justo donde hay que mostrarlo.
+      {
+        re: /\b(el ADN de|la columna vertebral|el corazón de|un antes y un después|allanar el camino|tender puentes|dar el salto|sentar las bases|los pilares de|la punta del iceberg|mover la aguja|el santo grial)\b/gi,
+        motivo:
+          "Metáfora de relleno. El lenguaje tiene que ser concreto: en vez de la imagen, escribí la acción o el criterio de negocio real.",
       },
     ],
 
@@ -348,16 +377,31 @@ export const AGENCIA: BrandProfile = {
         regla: "El cierre condensa una idea. No pide interacción ni hace una pregunta retórica.",
         criterio: "Mirá la última línea. Si pide algo al lector en vez de afirmar algo, falla.",
       },
+      {
+        id: "titulos_con_gancho",
+        regla:
+          "Cada título abre con una tensión, un dato filoso o una pregunta concreta. Nunca un rótulo plano.",
+        criterio:
+          "Revisá cada título, incluido el del cierre. Un rótulo que solo nombra la sección —'Conclusión', 'Resumen', 'El problema', 'La solución', 'Cierre', 'Reflexión final'— falla. También falla un título que repite la bajada con otras palabras. El título promete algo concreto y el cuerpo lo cumple.",
+      },
+      {
+        id: "cuerpo_ensena",
+        regla:
+          "El cuerpo enseña, no enuncia. Explica el concepto de forma accionable con un ejemplo o un criterio concreto.",
+        criterio:
+          "¿El cuerpo agrega algo que el título no dice ya? Si solo reformula el título o describe el tema en general sin dar un criterio, un ejemplo o un número, falla.",
+      },
     ],
 
     guia: [
       "Frases cortas y afirmativas. Voz activa siempre.",
       "El mecanismo sobre la etiqueta: en vez de 'es más eficiente', explicá qué deja de costar plata.",
       "Números concretos antes que adjetivos.",
+      "La tensión por contraste ordena el pensamiento: lo que dice el reporte contra lo que pasa en la caja. Es la estructura, no la fórmula literal 'no es X, es Y', que está prohibida.",
       "Variá el ritmo. La cadencia de frases secas cortas pega una vez; repetida en la misma pieza suena a fórmula.",
       "Cerrá con una sola línea que condense la idea.",
       "Emojis: máximo uno o dos, y solo si ayudan a escanear.",
-      "La raya (—) con moderación. Nada de signos múltiples.",
+      "La raya (—) con moderación. Nada de signos múltiples. Evitá el punto seguido de apertura de pregunta ('. ¿'): reestructurá con coma o fusioná en una sola oración.",
     ],
 
     firmas: {
