@@ -132,6 +132,61 @@ export interface Vara {
   prohibidoComoAprendizaje: string[]
 }
 
+// ── Taxonomía ───────────────────────────────────────────────────────────────
+// Los ejes sobre los que rota el contenido. Es lo que hace que el sistema no
+// se quede sin qué decir: el material no viene de afuera, sale de combinar
+// estos ejes. Seis pilares × seis temas × ocho tensiones × ocho frameworks ×
+// dos personas × seis tipos son miles de casilleros distintos.
+//
+// Cada eje hace algo diferente y por eso son ortogonales:
+//   pilar      → la LENTE con la que se mira (un error, un criterio, un caso)
+//   tema       → el ÁREA de la que se habla
+//   tension    → el CONFLICTO que anima la pieza
+//   framework  → la ESTRUCTURA con la que se cuenta
+//   tipo       → el REGISTRO de la pieza
+
+export interface Pilar {
+  id: string
+  label: string
+  /** Qué busca esta lente. Se inyecta en el prompt. */
+  busca: string
+}
+
+export interface Tema {
+  id: string
+  label: string
+  descripcion: string
+  /** Qué NO entra en este tema. Evita que se desborde hacia áreas ajenas. */
+  nunca?: string
+}
+
+export interface Taxonomia {
+  pilares: Pilar[]
+  temas: Tema[]
+  /** El conflicto que anima la pieza. Nunca dos seguidas con la misma. */
+  tensiones: string[]
+  /** Estructuras narrativas disponibles. */
+  frameworks: string[]
+  tiposContenido: string[]
+  /**
+   * Día de la semana (0=domingo) → pilar preferido. Rotación determinística:
+   * le da ritmo al feed sin costar una llamada al modelo.
+   */
+  pilarPorDia: Record<number, string>
+}
+
+/**
+ * Metadatos que la pieza DECLARA sobre sí misma. Se validan contra las
+ * restricciones después de generar: el modelo puede decir que eligió una
+ * tensión y haber repetido la anterior, y eso se chequea.
+ */
+export interface MetaPieza {
+  tension: string
+  framework: string
+  tipoContenido: string
+  personaId: string
+}
+
 // ── El perfil completo ──────────────────────────────────────────────────────
 export interface BrandProfile {
   id: string
