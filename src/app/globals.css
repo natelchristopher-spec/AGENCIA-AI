@@ -196,3 +196,49 @@ details summary {
 .nav-inner a:hover {
   border-bottom-color: var(--ink);
 }
+
+.campo {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.campo > span {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.campo textarea,
+.campo select,
+.campo input {
+  width: 100%;
+  border: 2px solid var(--rule);
+  background: var(--paper);
+  color: var(--ink);
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.campo textarea {
+  resize: vertical;
+}
+
+.fila {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.fila .campo {
+  flex: 1 1 220px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}

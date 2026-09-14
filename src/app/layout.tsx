@@ -17,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/">Inicio</Link>
             <Link href="/sistema">Sistema</Link>
             <Link href="/manual">Manual de marca</Link>
+            <Link href="/probar">Probar</Link>
             <Link href="/cola">Cola</Link>
           </div>
         </nav>

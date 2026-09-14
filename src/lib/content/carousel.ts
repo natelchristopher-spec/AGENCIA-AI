@@ -156,6 +156,20 @@ export function aRevisable(carrusel: Carrusel, fuente?: string): PiezaRevisable 
   }
 }
 
+/**
+ * Una sola pasada, sin ciclo de reescritura.
+ *
+ * Para calibrar es lo que se quiere mirar: el veredicto sobre el PRIMER
+ * intento dice si la vara está bien puesta. El tercer intento ya fue guiado
+ * por el crítico y no informa sobre la calidad del generador.
+ */
+export async function generarUnaVez(
+  profile: BrandProfile,
+  entrada: EntradaCarrusel,
+): Promise<Carrusel> {
+  return generarUna(profile, entrada, [], await ventanaReciente(entrada.historial))
+}
+
 async function generarUna(
   profile: BrandProfile,
   entrada: EntradaCarrusel,
