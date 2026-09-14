@@ -182,7 +182,7 @@ export default function Sistema() {
             verifica que un hallazgo no sea obvio, así que de ahí depende toda la calidad.
           </li>
           <li>
-            <strong>Variables de entorno:</strong> <code>ANTHROPIC_API_KEY</code>,{" "}
+            <strong>Variables de entorno:</strong> <code>OPENAI_API_KEY</code>,{" "}
             <code>SUPABASE_URL</code>, <code>SUPABASE_SERVICE_ROLE_KEY</code>,{" "}
             <code>CRON_SECRET</code>.
           </li>

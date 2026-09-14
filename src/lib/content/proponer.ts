@@ -11,12 +11,9 @@
 // pieza — y un tema que no puede justificarlo se descarta acá, antes de gastar
 // una generación entera en él.
 
-import Anthropic from "@anthropic-ai/sdk"
-import { parsearRespuesta } from "@/lib/ai/json"
+import { completarJson, hayClave } from "@/lib/ai/llm"
 import { bloquePersona, bloqueVara } from "@/lib/brand/prompt"
 import { personaDe, type BrandProfile } from "@/lib/brand/types"
-
-const MODEL = "claude-sonnet-5"
 
 export interface TemaPropuesto {
   /** Id del servicio al que ancla, copiado del rótulo de la fuente. */
@@ -77,7 +74,7 @@ export async function proponerTemas(
   material: string,
   opts: { personaId?: string; yaCubiertas?: string[]; maximo?: number } = {},
 ): Promise<Propuesta> {
-  if (!process.env.ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY no configurada")
+  if (!hayClave()) throw new Error("OPENAI_API_KEY no configurada")
   if (!material.trim()) return { temas: [], descartados: [] }
 
   const personaId = opts.personaId ?? profile.personaDefault
@@ -90,23 +87,15 @@ export async function proponerTemas(
 
   const hoy = new Date().toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" })
 
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-  const res = await client.messages.create({
-    model: MODEL,
-    max_tokens: 3072,
+  const parsed = await completarJson<{ temas?: unknown; descartados?: unknown }>({
+    rol: "proponer",
+    maxTokens: 3072,
     system: systemPrompt(profile, personaId),
-    messages: [
-      {
-        role: "user",
-        content: `Hoy es ${hoy}. Proponé como máximo ${maximo} temas a partir de este material.${cubiertas}
+    user: `Hoy es ${hoy}. Proponé como máximo ${maximo} temas a partir de este material.${cubiertas}
 
 MATERIAL EN BRUTO:
 ${material}`,
-      },
-    ],
   })
-
-  const parsed = parsearRespuesta<{ temas?: unknown; descartados?: unknown }>(res)
 
   const temas: TemaPropuesto[] = Array.isArray(parsed.temas)
     ? (parsed.temas as Record<string, unknown>[])

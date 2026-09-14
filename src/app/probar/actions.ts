@@ -27,11 +27,11 @@ export async function probarPieza(
   const fuente = String(formData.get("fuente") ?? "").trim()
   if (!fuente) return { ok: false, error: "Falta la fuente: el sistema no inventa nada fuera de ella." }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!process.env.OPENAI_API_KEY) {
     return {
       ok: false,
       error:
-        "Falta ANTHROPIC_API_KEY en las variables de entorno de Vercel. Settings → Environment Variables, y volvé a desplegar.",
+        "Falta OPENAI_API_KEY en las variables de entorno de Vercel. Settings → Environment Variables, y volvé a desplegar.",
     }
   }
 

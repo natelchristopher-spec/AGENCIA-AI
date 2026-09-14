@@ -5,10 +5,8 @@
 // cortar; conviene salvar lo que llegó.
 //
 // Las capas van de la más barata a la más cara: parseo directo, bloque voraz,
-// reparación. Si todas fallan, el error dice QUÉ pasó —se cortó por longitud—
-// en vez de filtrar un error crudo de JSON.parse que no le sirve a nadie.
-
-import type Anthropic from "@anthropic-ai/sdk"
+// reparación. Si todas fallan, quien llama traduce el error mirando por qué
+// terminó la respuesta.
 
 /**
  * Cierra un JSON truncado: termina el string abierto, saca la coma colgante y
@@ -74,19 +72,5 @@ export function extraerJson<T = Record<string, unknown>>(texto: string): T {
     return JSON.parse(repararJson(candidato)) as T
   } catch {
     throw new Error("El modelo devolvió un JSON incompleto que no se pudo reparar.")
-  }
-}
-
-/** Parsea la respuesta distinguiendo el corte por longitud de un JSON malo. */
-export function parsearRespuesta<T = Record<string, unknown>>(res: Anthropic.Message): T {
-  const primero = res.content[0]
-  const texto = primero && primero.type === "text" ? primero.text : ""
-  try {
-    return extraerJson<T>(texto)
-  } catch (err) {
-    if (res.stop_reason === "max_tokens") {
-      throw new Error("La respuesta se cortó por longitud. Reintentá con menos contenido.")
-    }
-    throw err
   }
 }

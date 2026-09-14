@@ -21,7 +21,7 @@ export default function Contenido() {
       {!protegido && (
         <div className="warn">
           <strong>Estas rutas están abiertas.</strong> Cada generación gasta crédito de tu cuenta de
-          Anthropic y el sitio es público. Configurá <code>APP_PASSWORD</code> en las variables de
+          OpenAI y el sitio es público. Configurá <code>APP_PASSWORD</code> en las variables de
           entorno de Vercel para cerrarlas.
         </div>
       )}

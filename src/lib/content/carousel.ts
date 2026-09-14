@@ -6,8 +6,7 @@
 // Así la calidad de la voz se puede validar sin gastar en generación de imagen,
 // que es la parte cara y la que conviene enchufar una vez que el texto afina.
 
-import Anthropic from "@anthropic-ai/sdk"
-import { parsearRespuesta } from "@/lib/ai/json"
+import { completarJson } from "@/lib/ai/llm"
 import { normalizar } from "@/lib/brand/normalize"
 import { bloqueVoz } from "@/lib/brand/prompt"
 import type { BrandProfile } from "@/lib/brand/types"
@@ -27,8 +26,6 @@ import {
   type Historial,
   type PiezaHistorica,
 } from "./redundancy"
-
-const MODEL = "claude-sonnet-5"
 
 export interface Slide {
   numero: number
@@ -176,17 +173,14 @@ async function generarUna(
   violaciones: Violacion[],
   recientes: PiezaHistorica[],
 ): Promise<Carrusel> {
-  if (!process.env.ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY no configurada")
-
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-  const res = await client.messages.create({
-    model: MODEL,
-    max_tokens: 3072,
+  const raw = await completarJson({
+    rol: "generar",
+    maxTokens: 3072,
     system: systemPrompt(profile, entrada),
-    messages: [{ role: "user", content: userMessage(entrada, violaciones, recientes) }],
+    user: userMessage(entrada, violaciones, recientes),
   })
 
-  return normalizarSalida(profile, parsearRespuesta(res))
+  return normalizarSalida(profile, raw)
 }
 
 /**

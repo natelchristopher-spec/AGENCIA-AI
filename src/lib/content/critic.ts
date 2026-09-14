@@ -17,13 +17,11 @@
 // El crítico no reescribe. Diagnostica, y quien generó vuelve a intentar
 // sabiendo exactamente qué se coló.
 
-import Anthropic from "@anthropic-ai/sdk"
-import { parsearRespuesta } from "@/lib/ai/json"
+import { completarJson, hayClave } from "@/lib/ai/llm"
 import { revisionDeterministica } from "@/lib/brand/normalize"
 import { bloqueVara, bloquePersona, bloquePruebas } from "@/lib/brand/prompt"
 import { personaDe, type BrandProfile } from "@/lib/brand/types"
 
-const MODEL = "claude-sonnet-5"
 const MAX_REESCRITURAS = 2
 
 export interface Ficha {
@@ -128,24 +126,22 @@ export async function revisar(profile: BrandProfile, pieza: PiezaRevisable): Pro
     }
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!hayClave()) {
     return {
       estado: "revision_humana",
       violaciones: deterministicas,
-      motivo: "ANTHROPIC_API_KEY no configurada: no se pudo correr la revisión de criterio.",
+      motivo: "OPENAI_API_KEY no configurada: no se pudo correr la revisión de criterio.",
     }
   }
 
   let porCriterio: Violacion[]
   try {
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-    const res = await client.messages.create({
-      model: MODEL,
-      max_tokens: 2048,
+    const parsed = await completarJson<{ violaciones?: unknown }>({
+      rol: "criticar",
+      maxTokens: 2048,
       system: systemPrompt(profile, pieza.ficha.buyer),
-      messages: [{ role: "user", content: userMessage(pieza) }],
+      user: userMessage(pieza),
     })
-    const parsed = parsearRespuesta<{ violaciones?: unknown }>(res)
     porCriterio = normalizarViolaciones(parsed.violaciones, pieza.texto)
   } catch (err) {
     // Falla cerrado: sin revisión de criterio no hay aprobación posible.

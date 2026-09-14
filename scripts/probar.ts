@@ -144,8 +144,8 @@ async function main() {
   const flags = parsearFlags(process.argv.slice(2))
   const fuente = flags.fuente ? readFileSync(flags.fuente, "utf8") : FUENTE_DEMO
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.error("Falta ANTHROPIC_API_KEY.")
+  if (!process.env.OPENAI_API_KEY) {
+    console.error("Falta OPENAI_API_KEY.")
     process.exit(1)
   }
 

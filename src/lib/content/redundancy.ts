@@ -14,11 +14,8 @@
 // Inyectar lo ya dicho en el prompt evita la repetición antes de que se genere;
 // detectarla después obliga a una ronda entera de regeneración.
 
-import Anthropic from "@anthropic-ai/sdk"
-import { parsearRespuesta } from "@/lib/ai/json"
+import { completarJson, hayClave } from "@/lib/ai/llm"
 import type { BrandProfile } from "@/lib/brand/types"
-
-const MODEL = "claude-sonnet-5"
 
 /** Cuántas piezas hacia atrás se miran. Más allá, repetir un ángulo es legítimo. */
 const VENTANA = 20
@@ -189,26 +186,23 @@ export async function detectarRedundancia(
     }
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) return { esRedundante: false }
+  if (!hayClave()) return { esRedundante: false }
 
   try {
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-    const res = await client.messages.create({
-      model: MODEL,
-      max_tokens: 512,
+    const parsed = await completarJson<{
+      redundante?: unknown
+      choca_con?: unknown
+      motivo?: unknown
+    }>({
+      rol: "criticar",
+      maxTokens: 512,
       system: SYSTEM_JUEZ,
-      messages: [
-        {
-          role: "user",
-          content: `PIEZA NUEVA:
+      user: `PIEZA NUEVA:
 ${candidato.aprendizaje}
 
 YA PUBLICADAS:
 ${historial.map((p) => `[${p.id}] ${p.aprendizaje}`).join("\n")}`,
-        },
-      ],
     })
-    const parsed = parsearRespuesta<{ redundante?: unknown; choca_con?: unknown; motivo?: unknown }>(res)
     if (parsed.redundante !== true) return { esRedundante: false }
     return {
       esRedundante: true,

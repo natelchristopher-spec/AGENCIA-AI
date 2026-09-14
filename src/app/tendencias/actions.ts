@@ -18,8 +18,8 @@ export async function barrer(
   _prev: ResultadoBarrido | null,
   formData: FormData,
 ): Promise<ResultadoBarrido> {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return { ok: false, error: "Falta ANTHROPIC_API_KEY en las variables de entorno de Vercel." }
+  if (!process.env.OPENAI_API_KEY) {
+    return { ok: false, error: "Falta OPENAI_API_KEY en las variables de entorno de Vercel." }
   }
 
   const personaId = String(formData.get("persona") ?? AGENCIA.personaDefault)
