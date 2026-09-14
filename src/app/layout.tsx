@@ -15,6 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <nav className="nav">
           <div className="nav-inner">
             <Link href="/">Inicio</Link>
+            <Link href="/contenido">Generar</Link>
             <Link href="/sistema">Sistema</Link>
             <Link href="/manual">Manual de marca</Link>
             <Link href="/tendencias">Tendencias</Link>
