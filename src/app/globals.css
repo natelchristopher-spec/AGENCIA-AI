@@ -146,3 +146,25 @@ td {
 .scroll-x {
   overflow-x: auto;
 }
+
+.btn {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid var(--rule);
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: var(--accent);
+}
+
+details summary {
+  cursor: pointer;
+  margin-top: 12px;
+  color: var(--muted);
+}
