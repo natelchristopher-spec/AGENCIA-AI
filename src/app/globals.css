@@ -1,0 +1,148 @@
+:root {
+  --ink: #0a0a0a;
+  --paper: #f4f4f0;
+  --accent: #d9ff00;
+  --muted: #6b6b66;
+  --rule: #0a0a0a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding-block: 48px;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+h1 {
+  font-size: clamp(2rem, 6vw, 3.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin: 0 0 8px;
+  font-weight: 900;
+}
+
+h2 {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--muted);
+  margin: 48px 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--rule);
+}
+
+h3 {
+  font-size: 1.05rem;
+  margin: 24px 0 6px;
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0 0 12px;
+}
+
+ul {
+  margin: 0 0 12px;
+  padding-left: 20px;
+}
+
+li {
+  margin-bottom: 6px;
+}
+
+code,
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85em;
+}
+
+a {
+  color: var(--ink);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.lede {
+  font-size: 1.1rem;
+  max-width: 62ch;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.swatch {
+  border: 2px solid var(--rule);
+  padding: 12px;
+  min-width: 132px;
+  flex: 1 1 132px;
+}
+
+.chip {
+  height: 56px;
+  border: 2px solid var(--rule);
+  margin-bottom: 8px;
+}
+
+.card {
+  border: 2px solid var(--rule);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.warn {
+  border: 2px solid var(--rule);
+  background: var(--accent);
+  padding: 16px 20px;
+  margin: 16px 0;
+}
+
+.tag {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: 2px solid var(--rule);
+  padding: 2px 8px;
+  margin-bottom: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+th,
+td {
+  text-align: left;
+  border-bottom: 1px solid var(--rule);
+  padding: 8px 10px 8px 0;
+  vertical-align: top;
+}
+
+.scroll-x {
+  overflow-x: auto;
+}
