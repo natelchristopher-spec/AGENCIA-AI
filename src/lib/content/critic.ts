@@ -203,13 +203,29 @@ export async function cicloDeCalidad<T>(
   profile: BrandProfile,
   generar: (violaciones: Violacion[]) => Promise<T>,
   aRevisable: (pieza: T) => PiezaRevisable,
+  /**
+   * Chequeos sobre otros ejes además de la voz (repetición, por ejemplo). Lo
+   * que devuelva se suma a las violaciones y alimenta la regeneración igual
+   * que las del crítico.
+   */
+  verificacionExtra?: (pieza: T) => Promise<Violacion[]>,
 ): Promise<ResultadoCiclo<T>> {
   let mejor: { pieza: T; veredicto: Veredicto } | null = null
 
   for (let ronda = 0; ronda <= MAX_REESCRITURAS; ronda++) {
     const violacionesPrevias = mejor?.veredicto.violaciones ?? []
     const pieza = await generar(violacionesPrevias)
-    const veredicto = await revisar(profile, aRevisable(pieza))
+
+    const base = await revisar(profile, aRevisable(pieza))
+    const extra = verificacionExtra ? await verificacionExtra(pieza) : []
+    const violaciones = [...base.violaciones, ...extra]
+    const veredicto: Veredicto =
+      base.estado === "revision_humana"
+        ? { ...base, violaciones }
+        : {
+            estado: violaciones.some((v) => v.severidad === "bloquea") ? "reescribir" : "aprobado",
+            violaciones,
+          }
 
     if (veredicto.estado === "aprobado") return { pieza, veredicto, rondas: ronda }
 

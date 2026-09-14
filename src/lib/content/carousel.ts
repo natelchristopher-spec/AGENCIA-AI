@@ -20,6 +20,13 @@ import {
   type Violacion,
 } from "./critic"
 import { bloqueObjetivo, type Objetivo } from "./objectives"
+import {
+  bloqueAntiRepeticion,
+  detectarRedundancia,
+  ventanaReciente,
+  type Historial,
+  type PiezaHistorica,
+} from "./redundancy"
 
 const MODEL = "claude-sonnet-5"
 
@@ -52,6 +59,8 @@ export interface EntradaCarrusel {
   /** URL para el CTA, cuando el objetivo la pide. */
   url?: string
   contextoExtra?: string
+  /** Lo ya publicado. Sin esto el sistema se repite a las pocas semanas. */
+  historial?: Historial
 }
 
 const REGLAS_FORMATO = `## Reglas del formato carrusel
@@ -85,8 +94,13 @@ RESPONDÉ EXCLUSIVAMENTE con JSON válido (sin markdown):
 }`
 }
 
-function userMessage(entrada: EntradaCarrusel, violaciones: Violacion[]): string {
+function userMessage(
+  entrada: EntradaCarrusel,
+  violaciones: Violacion[],
+  recientes: PiezaHistorica[],
+): string {
   const correccion = bloqueCorreccion(violaciones)
+  const antiRepeticion = bloqueAntiRepeticion(recientes)
   return `Generá el carrusel.
 
 ${entrada.tematica?.trim() ? `TEMÁTICA (enfocá TODA la pieza solo en esto): ${entrada.tematica}\n` : ""}
@@ -94,6 +108,7 @@ FUENTE (material de referencia; no inventes nada fuera de esto):
 ${entrada.fuente}
 ${entrada.contextoExtra?.trim() ? `\nCONTEXTO ADICIONAL:\n${entrada.contextoExtra}` : ""}
 ${entrada.url?.trim() ? `\nURL para el CTA del copy_post (copiala literal, sin acortadores ni placeholders): ${entrada.url}` : ""}
+${antiRepeticion ? `\n${antiRepeticion}` : ""}
 ${correccion ? `\n${correccion}` : ""}
 
 Devolvé el JSON completo, con la ficha.`
@@ -145,6 +160,7 @@ async function generarUna(
   profile: BrandProfile,
   entrada: EntradaCarrusel,
   violaciones: Violacion[],
+  recientes: PiezaHistorica[],
 ): Promise<Carrusel> {
   if (!process.env.ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY no configurada")
 
@@ -153,24 +169,47 @@ async function generarUna(
     model: MODEL,
     max_tokens: 3072,
     system: systemPrompt(profile, entrada),
-    messages: [{ role: "user", content: userMessage(entrada, violaciones) }],
+    messages: [{ role: "user", content: userMessage(entrada, violaciones, recientes) }],
   })
 
   return normalizarSalida(profile, parsearRespuesta(res))
 }
 
 /**
- * Genera un carrusel y lo pasa por el ciclo de calidad: si el crítico encuentra
- * violaciones, se regenera nombrándolas, hasta dos veces. Lo que no cierra
- * queda en revision_humana con el detalle de qué falló.
+ * Genera un carrusel y lo pasa por el ciclo de calidad: si el crítico o el
+ * chequeo de repetición encuentran algo, se regenera nombrándolo, hasta dos
+ * veces. Lo que no cierra queda en revision_humana con el detalle.
+ *
+ * El historial se consulta UNA vez y sirve a los dos frentes: entra en el
+ * prompt para prevenir la repetición, y se usa después para detectarla. La
+ * prevención es la que hace el trabajo; la detección es la red.
  */
 export async function generarCarrusel(
   profile: BrandProfile,
   entrada: EntradaCarrusel,
 ): Promise<ResultadoCiclo<Carrusel>> {
+  const recientes = await ventanaReciente(entrada.historial)
+
   return cicloDeCalidad(
     profile,
-    (violaciones) => generarUna(profile, entrada, violaciones),
+    (violaciones) => generarUna(profile, entrada, violaciones, recientes),
     (carrusel) => aRevisable(carrusel, entrada.fuente),
+    async (carrusel) => {
+      const veredicto = await detectarRedundancia(
+        { aprendizaje: carrusel.ficha.aprendizaje },
+        recientes,
+      )
+      if (!veredicto.esRedundante) return []
+      return [
+        {
+          regla: "redundancia",
+          cita: carrusel.ficha.aprendizaje,
+          por_que: `${veredicto.motivo ?? "Repite un hallazgo ya publicado."}${
+            veredicto.chocaCon ? ` (choca con "${veredicto.chocaCon}")` : ""
+          } Buscá otro ángulo: el tema puede repetirse, el hallazgo no.`,
+          severidad: "bloquea" as const,
+        },
+      ]
+    },
   )
 }
